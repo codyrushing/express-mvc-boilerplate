@@ -1,0 +1,17 @@
+{
+  "author": "codyrushing",
+  "name": "node-beacon",
+  "description": "A node.js server to provide a REST API for Bluetooth Low Energy beacon clients.",
+  "version": "0.0.1",
+  "private": true,
+  "node": "0.10.21",
+  "main": "app.js",
+  "dependencies": {
+    "connect": "latest",
+    "express": ">=3.0",
+    "jade": ">=0.27.0",
+    "mongoose": "latest",
+    "bcrypt": "latest",
+    "connect-mongo": "latest"
+  }
+}
