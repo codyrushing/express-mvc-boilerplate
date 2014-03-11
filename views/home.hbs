@@ -1,0 +1,17 @@
+{{#if showTitle}}
+    <h1>Home</h1>
+{{/if}}
+
+<!-- Calls `foo` helper, overridden at render-level. -->
+<p>{{foo}}</p>
+
+<!-- Calls `bar` helper, defined at instance-level. -->
+<p>{{bar}}</p>
+
+<p>{{> test1 }}</p>
+
+{{#eachLimit arr 5}}
+    <p>yeah {{this}}</p>
+{{/eachLimit}}
+
+{{#getPartialByName partialName data }}{{/getPartialByName}}

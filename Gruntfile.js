@@ -3,18 +3,34 @@ module.exports = function(grunt) {
     // 1. All configuration goes here
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
-
+        // concatenate all client-side js
         concat: {
-            // 2. Configuration for concatinating files goes here.
             build: {
-                src: [],
-                dest: "public/js/build/production.js",
+                src: ["public/js/**/*.js", "!public/js/build/**/*.js"],
+                dest: "public/js/build/<%=pkg.name %>.js",
             }
         },
+        // minify all client-side js
         uglify: {
             build: {
-                src: "public/js/build/production.js",
-                dest: "public/js/build/production.min.js"
+                src: "public/js/build/<%=pkg.name %>.js",
+                dest: "public/js/build/<%=pkg.name %>.min.js"
+            }
+        },
+        compass: {
+            dist: {
+                options: {
+                    config: "public/config.rb"
+                }
+            }
+        },
+        cssmin: {
+            minify: {
+                expand: true,
+                cwd: "public/css",
+                src: ["*.css", "!*.min.css"],
+                dest: "public/css",
+                ext: ".min.css"
             }
         },
         imagemin: {
@@ -30,19 +46,60 @@ module.exports = function(grunt) {
                 }]
             }
         },
+        handlebars: {
+            compile: {
+                files: {
+                   "public/js/templates.js": ["views/**/*.hbs"]
+                }
+            },
+            options: {
+                namespace: "Handlebars.templates",
+                partialsUseNamespace: true,
+                processName: function(filePath) {
+                    var parts = filePath.split("/"),
+                        target = parts[parts.length - 1];
+                    return target.split(".")[0];
+                }
+            }
+        },
+        express: {
+            options: {
+                port: 3000
+            },
+            dev: {
+                options: {
+                    script: "app.js"
+                }
+            }
+        },
         watch: {
             scripts: {
-                files: ['Gruntfile.js', "js/*.js", '!public/js/build/**/*'],
+                files: ["public/js/**/*.js", "!public/js/build/**/*"],
                 tasks: ["concat", "uglify"],
                 options: {
                     spawn: false
                 }
             },
             images: {
-                files: ["public/images/*.{png,jpg,gif}", '!public/images/min/**/*'],
+                files: ["public/images/*.{png,jpg,gif}", "!public/images/min/**/*"],
                 tasks: ["imagemin"],
                 options: {
                     spawn: false
+                }
+            },
+            css: {
+                files: ["public/sass/**/*.scss"],
+                tasks: ["compass", "cssmin"]
+            },
+            templates: {
+                files: ["views/**/*.hbs"],
+                tasks: ["handlebars"]
+            },
+            server: {
+                files: ["*.js", "models/*.js", "controllers/*.js" ,"!public/**/*.js", "!Gruntfile.js"],
+                tasks: ["express:dev:stop", "express:dev"],
+                options: {
+                    spawn: false // for grunt-contrib-watch v0.5.0+, "nospawn: true" for lower versions. Without this option specified express won't be reloaded
                 }
             }
         }
@@ -52,9 +109,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-imagemin");
+    grunt.loadNpmTasks("grunt-contrib-compass");
+    grunt.loadNpmTasks("grunt-contrib-cssmin");
+    grunt.loadNpmTasks("grunt-contrib-handlebars");
+    grunt.loadNpmTasks("grunt-express-server");
     grunt.loadNpmTasks("grunt-contrib-watch");
 
-    // 4. Where we tell Grunt what to do when we type "grunt" into the terminal.
-    grunt.registerTask("default", ["concat", "uglify", "imagemin", "watch"]);
+    grunt.registerTask("default", ["concat", "uglify", "imagemin", "compass", "cssmin", "handlebars", "express", "watch"]);
 
 };

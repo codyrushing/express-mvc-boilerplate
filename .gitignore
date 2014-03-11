@@ -1,3 +1,5 @@
 node_modules
 .DS_Store
 .sass-cache
+public/js/build/*.js
+public/css/*.min.css
