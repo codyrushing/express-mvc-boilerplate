@@ -6,7 +6,7 @@ module.exports = function(grunt) {
         // concatenate all client-side js
         concat: {
             build: {
-                src: ["public/js/**/*.js", "!public/js/build/**/*.js"],
+                src: ["public/js/lib/**/*.js", "public/js/templates.js", "public/js/helpers.js", "!public/js/build/**/*.js"],
                 dest: "public/js/build/<%=pkg.name %>.js",
             }
         },

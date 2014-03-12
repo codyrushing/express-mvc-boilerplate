@@ -3,12 +3,23 @@
 <head>
     <meta charset="utf-8" />
     <title>Example App - Home</title>
-    <link rel="stylesheet" type="text/css" href="public/css/style.css" />
+    {{#if debug}}
+	    <link rel="stylesheet" type="text/css" href="public/css/style.css" />
+    {{else}}
+	    <link rel="stylesheet" type="text/css" href="public/css/style.min.css" />
+    {{/if}}
 </head>
 <body>
 
 {{{body}}}
 
-<script type="text/javascript" src="public/js/build/express-boilerplate.min.js"></script>
+{{#if debug}}
+	<script type="text/javascript" src="public/js/lib/handlebars.runtime-v1.3.0.js"></script>
+	<script type="text/javascript" src="public/js/templates.js"></script>
+	<script type="text/javascript" src="public/js/helpers.js"></script>
+{{else}}
+	<script type="text/javascript" src="public/js/build/express-boilerplate.min.js"></script>
+{{/if}}
+
 </body>
 </html>

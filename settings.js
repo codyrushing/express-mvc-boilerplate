@@ -41,8 +41,9 @@ module.exports = function(app, config){
 	        dumpExceptions: true,
 	        showStack: true
 	    }));
-	    // beautifies all output - possibly turn off on production
-		// app.locals.pretty = true;
+	    // templates use minified and concatenated css and js by default
+	    // debug boolean used in templates to include unconcatenated and unminified css and js
+		app.locals.debug = true;
 	});
 
 	/*
