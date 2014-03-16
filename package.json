@@ -6,6 +6,9 @@
   "private": true,
   "node": "0.10.21",
   "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
   "dependencies": {
     "connect": "latest",
     "express": ">=3.0",

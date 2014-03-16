@@ -44,7 +44,7 @@ function program5(depth0,data) {
   stack1 = (helper = helpers.eachLimit || (depth0 && depth0.eachLimit),options={hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.arr), 5, options) : helperMissing.call(depth0, "eachLimit", (depth0 && depth0.arr), 5, options));
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n\n";
-  stack1 = (helper = helpers.getPartialByName || (depth0 && depth0.getPartialByName),options={hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data},helper ? helper.call(depth0, (depth0 && depth0.partialName), (depth0 && depth0.data), options) : helperMissing.call(depth0, "getPartialByName", (depth0 && depth0.partialName), (depth0 && depth0.data), options));
+  stack1 = (helper = helpers.getPartialByName || (depth0 && depth0.getPartialByName),options={hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data},helper ? helper.call(depth0, "test2", (depth0 && depth0.data), options) : helperMissing.call(depth0, "getPartialByName", "test2", (depth0 && depth0.data), options));
   if(stack1 || stack1 === 0) { buffer += stack1; }
   return buffer;
   });

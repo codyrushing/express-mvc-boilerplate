@@ -14,17 +14,17 @@ module.exports = function(app, config){
 
 	/* 
 	* View setup
-	* Set views path, template engine and turn off default layout so that we can use template inheritance instead
 	*/
 	var hbs = exphbs.create({
-        defaultLayout: "main",
-        extname: ".hbs",
-        partialsDir: 'views/partials/', // same as default, I just like to be explicit
-        layoutsDir: "views/layouts/" // same as default, I just like to be explicit
+	    defaultLayout: "main",
+	    extname: ".hbs",
+	    partialsDir: 'views/partials/', // same as default, I just like to be explicit
+	    layoutsDir: "views/layouts/" // same as default, I just like to be explicit
 	});
 
-	// our partials will need access to partials
+	// register helpers after partials have loaded, and pass Handlebars instance into register function
 	hbs.loadPartials(function(err, partials){
+		// attach partials to Handlebars instance, exposing them to helpers
 		hbs.handlebars.partials = partials;
 		require("./public/js/helpers").register(hbs.handlebars);
 	});

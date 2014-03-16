@@ -33,20 +33,6 @@
                 }
             },
             getPartialByName: function(name, data, options) {
-                // var ps = Handlebars.partials;
-
-                // // client
-                // if (typeof swa !== "undefined" && swa.templates && swa.templates[name]) {
-                //     ps[name] = swa.templates[name];
-                // }
-                // // server
-                // else {
-                //     if (typeof ps[name] != 'function') {
-                //         ps[name] = Handlebars.compile(ps[name]);
-                //     }
-                // }
-                // return ps[name](data, options);
-                
                 var template = Handlebars.partials[name];
                 if (template) {
                     if (typeof template !== 'function') {
@@ -64,13 +50,7 @@
                 }
 
                 return result.join("");
-            },
-            foo: function(){
-                return "FOO";
-            },
-            bar: function(){
-                return "BAR";
-            }            
+            }
         };
         /************* END HELPERS *************/
 
@@ -87,7 +67,7 @@
 
     // client
     if (typeof window !== "undefined") {
-        // since all partials and templates are in the same bucket, do this to allow partial lookups to work
+        // since all partials and templates precompiled into the same bucket, do this to allow partial lookups to work
         Handlebars.partials = Handlebars.templates;
         register(Handlebars);
     }
