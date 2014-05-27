@@ -5,12 +5,12 @@ var express = require("express");
 
 module.exports = function(app, config){
 
+	var env = process.env.NODE_ENV || "development";
+	
 	/* 
 	* Serve up files in the /public directory statically
 	*/
-	app.configure(function(){
-		app.use("/public", express.static(__dirname+'/public'));
-	});
+	app.use("/public", require("serve-static")(__dirname+"/public"));
 
 	/* 
 	* View setup
@@ -35,31 +35,25 @@ module.exports = function(app, config){
 	/*
 	* dev configuration
 	*/
-	app.configure('development', function() {
-	    app.use(express.logger('dev'));
-	    app.use(express.errorHandler({
-	        dumpExceptions: true,
-	        showStack: true
-	    }));
-	    // templates use minified and concatenated css and js by default
-	    // debug boolean used in templates to include unconcatenated and unminified css and js
-		app.locals.debug = true;
-	});
+	// if(env === "development"){
+	//     app.use(require("morgan")("dev"));
+	//     app.use(require("errorhandler")());
+	//     // templates use minified and concatenated css and js by default
+	//     // debug boolean used in templates to include unconcatenated and unminified css and js
+	// 	app.locals.debug = true;
 
-	/*
-	* production configuration
-	*/
-	app.configure("production", function(){
-		app.use(express.compress());		
-	});
+	// }
+	// /*
+	// * production configuration
+	// */
+	// else {		
+	// 	app.use(require("compression")({
+	// 		threshold: 512 // only compress things that are at least 512 bytes in size
+	// 	}));				
+	// }
 
 	// parse request body (JSON, or otherwise)
-	app.use(express.bodyParser());
-
-    /* 
-    * Middleware 
-    */
-    // logger
+	app.use(require("body-parser"));
 	
 	/* Session management */
 	// TODO, update this using new module
@@ -79,9 +73,6 @@ module.exports = function(app, config){
 	    	})
 	    }));
 	*/
-    
-    // router is required for all routs
-    app.use(app.router);
     
     // global error handler
 	app.use(function(err, req, res, next) {

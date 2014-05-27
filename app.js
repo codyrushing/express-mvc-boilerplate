@@ -10,12 +10,6 @@ var express = require("express"),
 require("./db-connect").connect(config);
 
 /* 
-* Set Express settings (middleware and etc)
-* see settings.js to add remove options
-*/
-require("./settings")(app, config);
-
-/* 
 * Load all models and controllers
 * remove if not needed, and you can also remove fs variable declaration above
 */
@@ -27,8 +21,14 @@ fs.readdirSync("./controllers").forEach(function(file){
 });
 
 /* 
+* Set Express settings (middleware and etc)
+* see settings.js to add remove options
+*/
+require("./settings")(app, config);
+
+/* 
 * Start listening 
 */
-app.listen(process.env.app_port || 3000, function(){
+app.listen(3000, function(){
 	console.log("aaaaand, we're off");
 });
