@@ -29,6 +29,6 @@ require("./settings")(app, config);
 /* 
 * Start listening 
 */
-app.listen(3000, function(){
-	console.log("aaaaand, we're off");
+app.listen(process.env.app_port || 3000, function(){
+	console.log("aaaaand, we're off on");
 });
