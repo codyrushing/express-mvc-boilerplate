@@ -17,12 +17,19 @@ module.exports = function(grunt) {
             }
         },
         compass: {
-            dist: {
+            options: {
+                basePath: "public/",
+                config: "public/config.rb"
+            },
+            compile: {
+
+            },
+            watch: {
                 options: {
-                    config: "public/config.rb"
+                    watch: true
                 }
             }
-        },
+        },        
         cssmin: {
             minify: {
                 expand: true,
@@ -61,13 +68,26 @@ module.exports = function(grunt) {
                 }
             }
         },
-        express: {
-            options: {
-                port: 3000
+        shell: {
+            app: {
+                command: "node ."
             },
+            appFork: {
+                command: "node . &"
+            }
+        },
+        nodemon: {
             dev: {
+                script: "<%=pkg.main %>",
                 options: {
-                    script: "app.js"
+                    ignore: ["node_modules/**", ".git/", ".sass-cache/", "public/", "Gruntfile.js"]                    
+                }
+            },
+            inspect: {
+                script: "<%=pkg.main %>",
+                options: {
+                    nodeArgs: ["<%= nodemon.args %>"],
+                    ignore: ["node_modules/**", ".git/", ".sass-cache/", "public/", "Gruntfile.js"]                    
                 }
             }
         },
@@ -87,20 +107,25 @@ module.exports = function(grunt) {
                 }
             },
             css: {
-                files: ["public/sass/**/*.scss"],
-                tasks: ["compass", "cssmin"]
+                files: ["public/css/**/*.css", "!public/css/**/*.min.css"],
+                tasks: ["cssmin"]
             },
             templates: {
                 files: ["views/**/*.hbs"],
                 tasks: ["handlebars"]
-            },
-            server: {
-                files: ["*.js", "models/*.js", "controllers/*.js" ,"!public/**/*.js", "!Gruntfile.js"],
-                tasks: ["express:dev:stop", "express:dev"],
-                options: {
-                    spawn: false // for grunt-contrib-watch v0.5.0+, "nospawn: true" for lower versions. Without this option specified express won't be reloaded
-                }
             }
+        },
+        concurrent: {
+            options: {
+                limit: 3,
+                logConcurrentOutput: true                
+            },
+            dev: {
+                tasks: ["nodemon:dev", "compass:watch", "watch"]
+            },
+            inspect: {
+                tasks: ["nodemon:inspect", "compass:watch", "watch"]
+            }            
         }
     });
 
@@ -111,9 +136,30 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-compass");
     grunt.loadNpmTasks("grunt-contrib-cssmin");
     grunt.loadNpmTasks("grunt-contrib-handlebars");
-    grunt.loadNpmTasks("grunt-express-server");
     grunt.loadNpmTasks("grunt-contrib-watch");
+    grunt.loadNpmTasks("grunt-shell");
+    grunt.loadNpmTasks("grunt-nodemon");
+    grunt.loadNpmTasks("grunt-concurrent");
 
-    grunt.registerTask("default", ["concat", "uglify", "imagemin", "compass", "cssmin", "handlebars", "express", "watch"]);
+    grunt.registerTask("default", ["concat", "uglify", "imagemin", "compass:compile", "cssmin", "handlebars", "shell:app"]);
+    grunt.registerTask("fork", ["concat", "uglify", "imagemin", "compass:compile", "cssmin", "handlebars", "shell:appFork"]);
+    grunt.registerTask("debug", function(inspect, breakOnFirstLine){
+        var nodemonTask = "dev";
+        if(inspect === "inspect"){
+
+            // switch to inspect nodemon task
+            nodemonTask = "inspect";
+            // set nodemon args based on breakOnFirstLine grunt argument
+            grunt.config.set("nodemon.args", breakOnFirstLine === "break" ? "--debug-brk" : "--debug");
+
+            // spawn node-inspector as a child process
+            grunt.util.spawn({
+                cmd: "node-inspector"
+            });
+            
+            console.log("Node inspector running at http://localhost:8080/debug?port=5858");
+        }
+        grunt.task.run(["concat", "uglify", "imagemin", "compass:compile", "cssmin", "handlebars", "concurrent:"+nodemonTask]);
+    });
 
 };

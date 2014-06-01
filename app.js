@@ -1,6 +1,5 @@
 var express = require("express"),
 	app = express(),
-	fs = require("fs"),
 	config = require("./config")[app.settings.env];
 
 /*
@@ -13,12 +12,8 @@ require("./db-connect").connect(config);
 * Load all models and controllers
 * remove if not needed, and you can also remove fs variable declaration above
 */
-fs.readdirSync("./models").forEach(function(file){
-	require("./models/" + file)(app);
-});
-fs.readdirSync("./controllers").forEach(function(file){
-	require("./controllers/" + file)(app);
-});
+require("./models")(app);
+require("./controllers")(app);
 
 /* 
 * Set Express settings (middleware and etc)
@@ -29,6 +24,7 @@ require("./settings")(app, config);
 /* 
 * Start listening 
 */
-app.listen(process.env.app_port || 3000, function(){
-	console.log("aaaaand, we're off on");
+app.set("port", process.env.PORT || 3000);
+app.listen(app.get("port"), function(){
+	console.log("Express server listening on port %s", app.get("port"));
 });
