@@ -1,8 +1,13 @@
+var hintedFiles = ["**/*.js", "!node_modules/**/*.js", "!public/js/build/**/*.js", "!public/js/lib/**/*.js", "!public/js/templates.js"];
+
 module.exports = function(grunt) {
 
     // 1. All configuration goes here
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
+        jshint: {
+            all: hintedFiles
+        },
         concat: {
             build: {
                 src: ["public/js/lib/**/*.js", "public/js/templates.js", "public/js/helpers.js", "!public/js/build/**/*.js"],
@@ -20,9 +25,6 @@ module.exports = function(grunt) {
             options: {
                 basePath: "public/",
                 config: "public/config.rb"
-            },
-            compile: {
-
             },
             watch: {
                 options: {
@@ -86,15 +88,29 @@ module.exports = function(grunt) {
             inspect: {
                 script: "<%=pkg.main %>",
                 options: {
-                    nodeArgs: ["<%= nodemon.args %>"],
+                    nodeArgs: ["--debug"],
+                    ignore: ["node_modules/**", ".git/", ".sass-cache/", "public/", "Gruntfile.js"]                    
+                }
+            },
+            inspectBreak: {
+                script: "<%=pkg.main %>",
+                options: {
+                    nodeArgs: ["--debug-brk"],
                     ignore: ["node_modules/**", ".git/", ".sass-cache/", "public/", "Gruntfile.js"]                    
                 }
             }
         },
         watch: {
-            scripts: {
+            clientScripts: {
                 files: ["public/js/**/*.js", "!public/js/build/**/*"],
                 tasks: ["concat", "uglify"],
+                options: {
+                    spawn: false
+                }
+            },
+            allScripts: {
+                files: hintedFiles,
+                tasks: ["jshint"],
                 options: {
                     spawn: false
                 }
@@ -125,11 +141,15 @@ module.exports = function(grunt) {
             },
             inspect: {
                 tasks: ["nodemon:inspect", "compass:watch", "watch"]
-            }            
+            },
+            inspectBreak: {
+                tasks: ["nodemon:inspectBreak", "compass:watch", "watch"]
+            }          
         }
     });
 
     // 3. Where we tell Grunt we plan to use this plug-in.
+    grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-imagemin");
@@ -141,16 +161,14 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-nodemon");
     grunt.loadNpmTasks("grunt-concurrent");
 
-    grunt.registerTask("default", ["concat", "uglify", "imagemin", "compass:compile", "cssmin", "handlebars", "shell:app"]);
-    grunt.registerTask("fork", ["concat", "uglify", "imagemin", "compass:compile", "cssmin", "handlebars", "shell:appFork"]);
+    grunt.registerTask("default", ["jshint", "concat", "uglify", "imagemin", "cssmin", "handlebars", "shell:app"]);
+    grunt.registerTask("fork", ["jshint", "concat", "uglify", "imagemin", "cssmin", "handlebars", "shell:appFork"]);
     grunt.registerTask("debug", function(inspect, breakOnFirstLine){
         var nodemonTask = "dev";
         if(inspect === "inspect"){
 
-            // switch to inspect nodemon task
-            nodemonTask = "inspect";
-            // set nodemon args based on breakOnFirstLine grunt argument
-            grunt.config.set("nodemon.args", breakOnFirstLine === "break" ? "--debug-brk" : "--debug");
+            // set nodemon task based on breakOnFirstLine grunt argument
+            nodemonTask = breakOnFirstLine === "break" ? "inspectBreak" : "inspect";
 
             // spawn node-inspector as a child process
             grunt.util.spawn({
@@ -159,7 +177,7 @@ module.exports = function(grunt) {
             
             console.log("Node inspector running at http://localhost:8080/debug?port=5858");
         }
-        grunt.task.run(["concat", "uglify", "imagemin", "compass:compile", "cssmin", "handlebars", "concurrent:"+nodemonTask]);
+        grunt.task.run(["jshint", "concat", "uglify", "imagemin", "cssmin", "handlebars", "concurrent:"+nodemonTask]);
     });
 
 };
